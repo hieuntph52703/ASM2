@@ -1,0 +1,117 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package repositories;
+import JDVC.DBConnect;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import model.Student;
+/**
+ *
+ * @author PC
+ */
+public class SinhVienRepo {
+    private Connection conn;
+    
+    public SinhVienRepo() {
+        conn = DBConnect.getConnection();
+    }
+    
+    public List<Student> getListStudents(){
+        List<Student> list = new ArrayList<>();
+        String querySelect = "Select * from Student";
+        try {
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(querySelect);
+            while (rs.next()) {
+                Student s = new Student();
+                s.setMaSV(rs.getString("MaSV"));
+                s.setHoTen(rs.getString("HoTen"));
+                s.setEmail(rs.getString("email"));
+                s.setSDT(rs.getString("SDT"));
+                s.setGioiTinh(rs.getInt("GioiTinh"));
+                s.setDiaChi(rs.getString("DiaChi"));
+                s.setHinhAnh(rs.getString("HinhAnh"));
+                list.add(s);
+            }
+            
+        } catch (Exception e) {
+            System.out.println("e: " + e);
+        }
+
+        return list;
+    }
+    
+    public int SaveStudent(Student st){
+            String sql = """
+                         insert into Student(MaSV,HoTen,email,SDT,GioiTinh,DiaChi,HinhAnh)
+                         values
+                         (?,?,?,?,?,?,?)
+                         """;
+            try {
+            Connection conn = DBConnect.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, st.getMaSV());
+            ps.setString(2, st.getHoTen());
+            ps.setString(3, st.getEmail());
+            ps.setString(4, st.getSDT());
+            ps.setInt(5, st.getGioiTinh());
+            ps.setString(6, st.getDiaChi());
+            ps.setString(7, st.getHinhAnh());
+            int x = ps.executeUpdate();
+            return x;
+        } catch (Exception e) {
+                System.out.println(e);
+                return 0;
+        }
+    }
+    
+     public int DeleteStudent(Student st){
+            String sql = """
+                         Delete Student
+                         where MaSV =?                        
+                         """;
+            try {
+            Connection conn = DBConnect.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, st.getMaSV());
+            
+            int x = ps.executeUpdate();
+            return x;
+        } catch (Exception e) {
+                System.out.println(e);
+                return 0;
+        }
+    }
+     
+      public int UpdateStudent(Student st){
+            String sql = """
+                         Update Student
+                         set  HoTen =?, email= ?, SDT = ?, GioiTinh = ?, DiaChi = ?, HinhAnh = ?     
+                         where MaSV = ?
+                         """;
+            try {
+            Connection conn = DBConnect.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            
+            ps.setString(1, st.getHoTen());
+            ps.setString(2, st.getEmail());
+            ps.setString(3, st.getSDT());
+            ps.setInt(4, st.getGioiTinh());
+            ps.setString(5, st.getDiaChi());
+            ps.setString(6, st.getHinhAnh());
+            ps.setString(7, st.getMaSV());
+            
+            int x = ps.executeUpdate();
+            return x;
+        } catch (Exception e) {
+                System.out.println(e);
+                return 0;
+        }
+    }
+      
+ }
+    
+
