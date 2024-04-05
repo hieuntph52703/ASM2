@@ -1,0 +1,137 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package repositories;
+
+import JDVC.DBConnect;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import model.Grade;
+
+/**
+ *
+ * @author PC
+ */
+public class DiemSVRepo {
+
+    private Connection conn;
+
+    public DiemSVRepo() {
+        conn = DBConnect.getConnection();
+    }
+
+    public List<Grade> getListGrade() {
+        List<Grade> listDiem = new ArrayList<>();
+        String querySelect = """
+                             select gr.MaSV, st.HoTen, gr.TiengAnh, gr.TinHoc, gr.GDTC 
+                             from Grade gr
+                             inner join Student st ON st.MaSV = gr.MaSV
+                             """;
+        try {
+            Statement gr = conn.createStatement();
+            ResultSet rs = gr.executeQuery(querySelect);
+            while (rs.next()) {
+                Grade gra = new Grade();
+                gra.setMaSV(rs.getString("MaSV"));
+                gra.setHoTen(rs.getString("HoTen"));
+                gra.setDiemTA(rs.getFloat("TiengAnh"));
+                gra.setDiemTin(rs.getFloat("TinHoc"));
+                gra.setDiemGDTC(rs.getFloat("GDTC"));
+                listDiem.add(gra);
+            }
+        } catch (Exception e) {
+            System.out.println("e: " + e);
+        }
+        return listDiem;
+    }
+
+    public Grade FindByMaSV(String ma) {
+        Grade gra = new Grade();
+        String querySelect = """
+                             select gr.MaSV, st.HoTen, gr.TiengAnh, gr.TinHoc, gr.GDTC 
+                             from Grade gr
+                             inner join Student st ON st.MaSV = gr.MaSV
+                             where gr.MaSV = ?
+                             """;
+        try {
+            Statement gr = conn.createStatement();
+            ResultSet rs = gr.executeQuery(querySelect);
+            while (rs.next()) {
+
+                gra.setMaSV(rs.getString("MaSV"));
+                gra.setHoTen(rs.getString("HoTen"));
+                gra.setDiemTA(rs.getFloat("TiengAnh"));
+                gra.setDiemTin(rs.getFloat("TinHoc"));
+                gra.setDiemGDTC(rs.getFloat("GDTC"));
+
+            }
+            return gra;
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
+    public int SaveDiem(Grade gra) {
+        String sql = """
+                             insert into Grade(MaSV, TiengAnh, TinHoc, GDTC)
+                             values
+                             (?,?,?,?)	
+                             """;
+        try {
+            Statement gr = conn.createStatement();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, gra.getMaSV());
+            ps.setFloat(2, gra.getDiemTA());
+            ps.setFloat(3, gra.getDiemTin());
+            ps.setFloat(4, gra.getDiemGDTC());
+            return ps.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return 0;
+    }
+
+    public int DeleteDiem(Grade gra) {
+        String sql = """
+                             delete from Grade
+                             Where MaSV =  ?
+                             """;
+        try {
+            Statement gr = conn.createStatement();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, gra.getMaSV()); 
+            return ps.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return 0;
+    }
+    public int UpdateDiem(Grade gra) {
+        String sql = """
+                        Update Grade set 
+                        TiengAnh = ?, TinHoc = ?, GDTC = ?
+                        where MaSV = ?
+                        """;
+        try {
+            Statement gr = conn.createStatement();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(4, gra.getMaSV());
+            ps.setFloat(1, gra.getDiemTA());
+            ps.setFloat(2, gra.getDiemTin());
+            ps.setFloat(3, gra.getDiemGDTC());
+           return ps.executeUpdate();
+            
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return 0;
+    }
+
+    
+}
